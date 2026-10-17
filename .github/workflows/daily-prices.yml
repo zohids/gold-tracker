@@ -1,4 +1,4 @@
-name: Update daily gold prices
+name: Update prices and publish site
 
 on:
   schedule:
@@ -7,26 +7,45 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 jobs:
-  update:
+  update-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: node scripts/update-prices.js
+      - name: Fetch daily gold prices and export static history
+        run: npm run update
       - name: Commit updated price history
         run: |
-          if git diff --quiet -- gold-prices.sqlite; then
-            echo "No price changes to commit"
-            exit 0
+          if ! git diff --quiet -- gold-prices.sqlite public/data/history.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add gold-prices.sqlite public/data/history.json
+            git commit -m "Update daily gold price history"
+            git push
           fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add gold-prices.sqlite
-          git commit -m "Update daily gold price history"
-          git push
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload static site
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: public
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

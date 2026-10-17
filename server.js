@@ -102,14 +102,16 @@ function snapshot(row) {
     sourceUrl: row.source_url, fetchedAt: row.fetched_at };
 }
 
+export function getPriceHistory() {
+  return db.prepare('SELECT * FROM price_history ORDER BY date DESC').all().map(snapshot);
+}
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/api/history', (_req, res) => {
-  const rows = db.prepare('SELECT * FROM price_history ORDER BY date DESC').all();
-  res.json(rows.map(snapshot));
+  res.json(getPriceHistory());
 });
 app.get('/api/current', (_req, res) => {
-  const row = db.prepare('SELECT * FROM price_history ORDER BY date DESC LIMIT 1').get();
-  res.json(row ? snapshot(row) : null);
+  res.json(getPriceHistory()[0] || null);
 });
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
 

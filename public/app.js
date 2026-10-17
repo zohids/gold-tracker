@@ -121,9 +121,10 @@ function showRange(days) {
 
 async function load() {
   try {
-    const [currentResponse, historyResponse] = await Promise.all([fetch('/api/current'), fetch('/api/history')]);
-    if (!currentResponse.ok || !historyResponse.ok) throw new Error('Unable to load price data');
-    const [current, history] = await Promise.all([currentResponse.json(), historyResponse.json()]);
+    const historyResponse = await fetch('data/history.json');
+    if (!historyResponse.ok) throw new Error('Unable to load price data');
+    const history = await historyResponse.json();
+    const current = history[0] || null;
     priceHistory = history;
     renderCurrent(current);
     renderHistory(history);
