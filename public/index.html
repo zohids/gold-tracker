@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f5f4ef" />
+  <title>Gold Ledger — Uzbekistan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="Gold Ledger home">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="m16 3 12 7-12 19L4 10l12-7Z"/><path d="m4 10 12 3 12-3M16 13v16M10 7l6 6 6-6"/></svg></span>
+        <span class="brand-copy"><strong>GOLD LEDGER</strong><small>UZBEKISTAN</small></span>
+      </a>
+      <nav class="topnav" aria-label="Main navigation"><a class="nav-link active" href="#overview">Overview</a><a class="nav-link" href="#history">History</a></nav>
+      <a class="source-link" href="https://cbu.uz/en/banknotes-coins/gold-bars/prices/" target="_blank" rel="noreferrer">CBU source <span aria-hidden="true">↗</span></a>
+    </header>
+
+    <main id="top">
+      <section class="hero" id="overview">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="live-dot"></span> CENTRAL BANK REFERENCE</div>
+          <h1>Gold, made<br /><em>clear.</em></h1>
+          <p class="intro">Official gold bar prices from the Central Bank of Uzbekistan, in one place.</p>
+          <div class="updated-row"><span>LAST PUBLISHED</span><strong id="published-date">Loading…</strong><i></i><span id="published-time">—</span></div>
+        </div>
+        <div class="price-card">
+          <div class="card-top"><span>INDICATIVE SELLING PRICE</span><span class="gold-icon" aria-hidden="true">✳</span></div>
+          <div class="unit-label">01 GRAM <span>·</span> 999.9 GOLD</div>
+          <div class="price-value" id="price-per-gram">—</div>
+          <div class="fx-caption" id="usd-rate">CBU exchange rate</div>
+          <div class="card-bottom"><span>Calculated from 100g bar</span><span class="status-pill"><b></b> CBU REFERENCE</span></div>
+          <div class="card-watermark" aria-hidden="true">Au</div>
+        </div>
+        <div class="hero-index" aria-hidden="true">01 <span>—</span> 02</div>
+      </section>
+
+      <section class="market-section" aria-labelledby="market-title">
+        <div class="section-heading"><div><div class="eyebrow muted">TODAY’S REFERENCE</div><h2 id="market-title">Gold bar prices</h2></div><p>UZS primary <span>· USD equivalent shown below</span></p></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th class="weight-heading">WEIGHT</th><th>SELLING PRICE</th><th>BUYBACK <small>INTACT PACKAGING</small></th><th>BUYBACK <small>DAMAGED PACKAGING</small></th></tr></thead>
+            <tbody id="price-rows"><tr><td colspan="4" class="loading-cell">Fetching official prices…</td></tr></tbody>
+          </table>
+        </div>
+        <div class="table-note"><span class="note-star">✳</span><p>Gold bar prices may be revised by the Central Bank as international precious metals markets change.</p><a href="https://cbu.uz/en/banknotes-coins/gold-bars/prices/" target="_blank" rel="noreferrer">View original <span>↗</span></a></div>
+      </section>
+
+      <section class="history-section" id="history" aria-labelledby="history-title">
+        <div class="history-heading"><div><div class="eyebrow muted">DAILY ARCHIVE</div><h2 id="history-title">Price history</h2></div><button class="chart-open" id="open-chart" type="button"><span aria-hidden="true">⌁</span> View chart</button></div>
+        <div class="history-panel">
+          <div class="history-intro"><span>DATE</span><span>PRICE / GRAM</span><span class="history-bar-heading"><label for="history-weight">SELLING PRICE</label><select id="history-weight" aria-label="Select history bar weight"><option value="5">5g</option><option value="10">10g</option><option value="20">20g</option><option value="50">50g</option><option value="100" selected>100g</option></select></span><span>CHANGE · UZS</span><span>VARIANCE · %</span></div>
+          <div id="history-rows"><div class="empty-history">Your daily price history will appear here after the first scheduled update.</div></div>
+          <div class="history-footer"><span><span class="history-live-dot"></span> UPDATES DAILY AT 11:00</span><span>UZBEKISTAN TIME · UTC+5</span></div>
+        </div>
+      </section>
+    </main>
+    <dialog class="chart-dialog" id="chart-dialog" aria-labelledby="chart-title">
+      <div class="chart-window">
+        <div class="chart-modal-head"><div><div class="eyebrow muted">DAILY ARCHIVE</div><h2 id="chart-title">Gold price trend</h2></div><button class="chart-close" id="close-chart" type="button" aria-label="Close chart">×</button></div>
+        <div class="chart-controls" role="group" aria-label="Chart date range">
+          <button class="range-button is-active" data-range="7" type="button">7 days</button>
+          <button class="range-button" data-range="30" type="button">30 days</button>
+          <label class="month-control">MONTH <select id="month-select" aria-label="Select month"><option value="">Select month</option></select></label>
+        </div>
+        <div class="chart-summary"><span>SELLING PRICE / GRAM</span><span class="chart-legend"><i></i> UZS</span></div>
+        <div class="chart-canvas" id="chart-canvas"><div class="chart-empty">Price history will appear here after daily snapshots are collected.</div></div>
+        <div class="chart-footer"><span id="chart-period">LAST 7 DAYS</span><span>Source: Central Bank of Uzbekistan</span></div>
+      </div>
+    </dialog>
+    <footer><div class="footer-brand"><span class="brand-mark small" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="m16 3 12 7-12 19L4 10l12-7Z"/><path d="m4 10 12 3 12-3M16 13v16M10 7l6 6 6-6"/></svg></span><span>GOLD LEDGER</span></div><span>Data sourced from the Central Bank of Uzbekistan</span><span>© 2026</span></footer>
+  </div>
+  <script src="/app.js" type="module"></script>
+</body>
+</html>

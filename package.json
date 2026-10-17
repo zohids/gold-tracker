@@ -1,0 +1,16 @@
+{
+  "name": "gold-tracker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "update": "node scripts/update-prices.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.8.1",
+    "cheerio": "^1.0.0",
+    "express": "^4.21.2"
+  }
+}
