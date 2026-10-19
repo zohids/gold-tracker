@@ -23,7 +23,7 @@ function renderCurrent(snapshot) {
   const perGram = pricePerGram(snapshot);
   $('#price-per-gram').innerHTML = `<span>${number.format(perGram)}<small>UZS</small></span><span class="price-usd">$${dollars.format(perGram / snapshot.usdRate)} <small>USD</small></span>`;
   $('#usd-rate').textContent = `CBU rate: 1 USD = ${number.format(snapshot.usdRate)} UZS · ${formatDate(snapshot.usdRateDate)}`;
-  $('#published-date').textContent = formatDate(snapshot.date);
+  $('#published-date').textContent = formatDate(snapshot.sourceDate || snapshot.date);
   $('#published-time').textContent = new Intl.DateTimeFormat('en-GB', {
     hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Tashkent', timeZoneName: 'short',
   }).format(published);
@@ -42,14 +42,15 @@ function renderHistory(history) {
   const selectedWeight = Number($('#history-weight').value || 100);
   host.innerHTML = history.map((snapshot, index) => {
     const selling = snapshot.bars.find((bar) => bar.weight === selectedWeight)?.selling;
-    const previous = history[index + 1]?.bars.find((bar) => bar.weight === selectedWeight)?.selling;
-    const delta = previous !== undefined ? selling - previous : null;
+    const currentGram = pricePerGram(snapshot);
+    const previousGram = history[index + 1] ? pricePerGram(history[index + 1]) : null;
+    const delta = previousGram !== null ? currentGram - previousGram : null;
     const direction = delta === null || delta === 0 ? '—' : `${delta > 0 ? '+' : '−'}${number.format(Math.abs(delta))}`;
     const cls = delta > 0 ? '' : delta < 0 ? 'down' : '';
-    const variance = previous === undefined || previous === 0 ? null : (delta / previous) * 100;
+    const variance = previousGram === null || previousGram === 0 ? null : (delta / previousGram) * 100;
     const varianceText = variance === null ? '—' : (variance > 0 ? '+' : '') + variance.toFixed(2) + '%';
     return `<div class="history-row">
-      <span class="history-date">${formatDate(snapshot.date)}</span>
+      <span class="history-date" title="CBU publication date: ${formatDate(snapshot.sourceDate || snapshot.date)}">${formatDate(snapshot.date)}<small>CBU ${formatDate(snapshot.sourceDate || snapshot.date)}</small></span>
       <span class="mono">${moneyPair(pricePerGram(snapshot), snapshot.usdRate)}</span>
       <span class="mono">${moneyPair(selling, snapshot.usdRate)}</span>
       <span class="change ${cls}">${direction} UZS</span>

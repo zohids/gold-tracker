@@ -22,12 +22,14 @@ db.exec(`CREATE TABLE IF NOT EXISTS price_history (
 const columns = db.prepare('PRAGMA table_info(price_history)').all().map((column) => column.name);
 if (!columns.includes('usd_rate')) db.exec('ALTER TABLE price_history ADD COLUMN usd_rate REAL');
 if (!columns.includes('usd_rate_date')) db.exec('ALTER TABLE price_history ADD COLUMN usd_rate_date TEXT');
+if (!columns.includes('source_date')) db.exec('ALTER TABLE price_history ADD COLUMN source_date TEXT');
+db.exec("UPDATE price_history SET source_date = substr(published_at, 1, 10) WHERE source_date IS NULL");
 
-const insertSnapshot = db.prepare(`INSERT INTO price_history (date, published_at, bars_json, source_url, fetched_at, usd_rate, usd_rate_date)
-  VALUES (@date, @publishedAt, @barsJson, @sourceUrl, @fetchedAt, @usdRate, @usdRateDate)
+const insertSnapshot = db.prepare(`INSERT INTO price_history (date, published_at, bars_json, source_url, fetched_at, usd_rate, usd_rate_date, source_date)
+  VALUES (@date, @publishedAt, @barsJson, @sourceUrl, @fetchedAt, @usdRate, @usdRateDate, @sourceDate)
   ON CONFLICT(date) DO UPDATE SET published_at=excluded.published_at, bars_json=excluded.bars_json,
     source_url=excluded.source_url, fetched_at=excluded.fetched_at, usd_rate=excluded.usd_rate,
-    usd_rate_date=excluded.usd_rate_date`);
+    usd_rate_date=excluded.usd_rate_date, source_date=excluded.source_date`);
 
 function parsePrice(text) {
   const n = Number(text.replace(/[^\d]/g, ''));
@@ -84,20 +86,24 @@ export async function refreshPrices() {
   if (!response.ok) throw new Error(`CBU returned HTTP ${response.status}`);
   const parsed = parseCbuPage(await response.text());
   const usd = await fetchUsdRate(parsed.date);
+  const observedDate = new Intl.DateTimeFormat('en-CA', {
+    timeZone: TIME_ZONE, year: 'numeric', month: '2-digit', day: '2-digit',
+  }).format(new Date());
   insertSnapshot.run({
-    date: parsed.date,
+    date: observedDate,
     publishedAt: parsed.publishedAt,
     barsJson: JSON.stringify(parsed.bars),
     sourceUrl: SOURCE_URL,
     fetchedAt: new Date().toISOString(),
     usdRate: usd.rate,
     usdRateDate: usd.date,
+    sourceDate: parsed.date,
   });
   return parsed;
 }
 
 function snapshot(row) {
-  return { date: row.date, publishedAt: row.published_at, bars: JSON.parse(row.bars_json),
+  return { date: row.date, sourceDate: row.source_date || row.published_at.slice(0, 10), publishedAt: row.published_at, bars: JSON.parse(row.bars_json),
     usdRate: row.usd_rate, usdRateDate: row.usd_rate_date,
     sourceUrl: row.source_url, fetchedAt: row.fetched_at };
 }

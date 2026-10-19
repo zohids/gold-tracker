@@ -14,3 +14,4 @@ body{font-size:16px}.brand-copy strong{font-size:12px}.brand-copy small{font-siz
 /* Daily variance column */
 .history-panel{overflow-x:auto}.history-intro,.history-row{min-width:720px;grid-template-columns:1.1fr 1fr 1fr .9fr .7fr}.history-intro span:last-child{text-align:right}.history-row>.change:last-child{text-align:right}.history-row>.change:nth-last-child(2){text-align:right}
 .history-bar-heading{display:flex;align-items:center;gap:9px;white-space:nowrap}.history-bar-heading label{font:inherit;color:inherit}.history-bar-heading select{border:1px solid #d8d6cc;background:#fbfaf7;color:#45473f;padding:5px 7px;font:10px var(--mono);letter-spacing:0;cursor:pointer}.history-bar-heading select:focus{outline:2px solid #bb935166;outline-offset:1px}
+.history-date small{display:block;margin-top:3px;color:#9a9b91;font:8px var(--mono);font-weight:400;white-space:nowrap}
