@@ -1,6 +1,9 @@
 name: Update prices and publish site
 
 on:
+  push:
+    branches:
+      - main
   schedule:
     - cron: '0 6 * * *' # 11:00 Asia/Tashkent (UTC+5)
   workflow_dispatch:
