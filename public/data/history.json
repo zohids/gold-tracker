@@ -1,44 +1,44 @@
 [
   {
-    "date": "2026-10-19",
-    "sourceDate": "2026-10-19",
-    "publishedAt": "2026-10-19T09:30:00+05:00",
+    "date": "2026-10-20",
+    "sourceDate": "2026-10-20",
+    "publishedAt": "2026-10-20T09:31:00+05:00",
     "bars": [
       {
         "weight": 5,
-        "selling": 9043000,
-        "buybackIntact": 8008000,
-        "buybackDamaged": 7927000
+        "selling": 9031000,
+        "buybackIntact": 7997000,
+        "buybackDamaged": 7916000
       },
       {
         "weight": 10,
-        "selling": 18087000,
-        "buybackIntact": 16016000,
-        "buybackDamaged": 15854000
+        "selling": 18062000,
+        "buybackIntact": 15994000,
+        "buybackDamaged": 15833000
       },
       {
         "weight": 20,
-        "selling": 36174000,
-        "buybackIntact": 32032000,
-        "buybackDamaged": 31709000
+        "selling": 36125000,
+        "buybackIntact": 31989000,
+        "buybackDamaged": 31666000
       },
       {
         "weight": 50,
-        "selling": 90435000,
-        "buybackIntact": 80081000,
-        "buybackDamaged": 79272000
+        "selling": 90312000,
+        "buybackIntact": 79972000,
+        "buybackDamaged": 79164000
       },
       {
         "weight": 100,
-        "selling": 180870000,
-        "buybackIntact": 160162000,
-        "buybackDamaged": 158544000
+        "selling": 180624000,
+        "buybackIntact": 159944000,
+        "buybackDamaged": 158329000
       }
     ],
-    "usdRate": 12055.9,
-    "usdRateDate": "2026-10-17",
+    "usdRate": 12044.72,
+    "usdRateDate": "2026-10-20",
     "sourceUrl": "https://cbu.uz/en/banknotes-coins/gold-bars/prices/",
-    "fetchedAt": "2026-10-19T14:41:55.828Z"
+    "fetchedAt": "2026-10-20T10:49:13.249Z"
   },
   {
     "date": "2026-10-16",
