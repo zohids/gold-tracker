@@ -86,11 +86,11 @@ export async function refreshPrices() {
   if (!response.ok) throw new Error(`CBU returned HTTP ${response.status}`);
   const parsed = parseCbuPage(await response.text());
   const usd = await fetchUsdRate(parsed.date);
-  const observedDate = new Intl.DateTimeFormat('en-CA', {
-    timeZone: TIME_ZONE, year: 'numeric', month: '2-digit', day: '2-digit',
-  }).format(new Date());
   insertSnapshot.run({
-    date: observedDate,
+    // Use the CBU publication date as the snapshot key. A repeated fetch for
+    // the same CBU publication replaces that day's row, while a new CBU date
+    // gets a separate history row (even when collected near midnight).
+    date: parsed.date,
     publishedAt: parsed.publishedAt,
     barsJson: JSON.stringify(parsed.bars),
     sourceUrl: SOURCE_URL,
