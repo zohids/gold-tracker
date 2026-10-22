@@ -115,6 +115,10 @@ export function getPriceHistory() {
   return db.prepare('SELECT * FROM price_history ORDER BY date DESC').all().map(snapshot);
 }
 
+export function checkpointDatabase() {
+  db.pragma('wal_checkpoint(TRUNCATE)');
+}
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/api/history', (_req, res) => {
   res.json(getPriceHistory());
