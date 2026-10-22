@@ -43,6 +43,10 @@ jobs:
             git commit -m "Update daily gold price history"
             git push
           fi
+      - name: Check out latest main before publishing
+        uses: actions/checkout@v4
+        with:
+          ref: main
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - name: Upload static site

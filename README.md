@@ -19,7 +19,7 @@ Set `FETCH_ON_START=true` to refresh from bank whenever the server starts. Set `
 
 ## Daily schedule
 
-The GitHub Actions workflow runs at 06:00 UTC (11:00 UTC+5), fetches the page, and commits the SQLite history file and static JSON archive. Enable Actions for the repository and allow the workflow to write repository contents. GitHub scheduled workflows can start late during busy periods. Each snapshot is keyed by the CBU publication date, so a new publication date creates a new history row and rerunning for that date updates the same row without creating duplicates.
+The GitHub Actions workflow runs at 06:00 UTC (11:00 UTC+5), fetches the page, and commits the SQLite history file and static JSON archive. Enable Actions for the repository and allow the workflow to write repository contents. GitHub scheduled workflows can start late during busy periods. Each snapshot is keyed by its collection date in Uzbekistan time; the CBU publication date and time are preserved separately. A repeat run updates the collection day's row without creating duplicates.
 
 ## Source fields
 
