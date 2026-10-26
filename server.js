@@ -10,6 +10,34 @@ const db = new Database(process.env.DATABASE_PATH || path.join(__dirname, 'gold-
 const SOURCE_URL = 'https://cbu.uz/en/banknotes-coins/gold-bars/prices/';
 const FX_URL = 'https://cbu.uz/en/arkhiv-kursov-valyut/json/USD';
 const TIME_ZONE = 'Asia/Tashkent';
+const MAX_FETCH_ATTEMPTS = 3;
+const RETRYABLE_HTTP_STATUSES = new Set([408, 425, 429, 500, 502, 503, 504]);
+
+const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
+
+async function fetchFromCbu(url, options) {
+  for (let attempt = 1; attempt <= MAX_FETCH_ATTEMPTS; attempt += 1) {
+    let response;
+    try {
+      response = await fetch(url, options);
+    } catch (error) {
+      if (attempt === MAX_FETCH_ATTEMPTS) throw error;
+      const delay = 1500 * (2 ** (attempt - 1));
+      console.warn(`CBU connection failed (attempt ${attempt}/${MAX_FETCH_ATTEMPTS}); retrying in ${delay} ms: ${error.message}`);
+      await wait(delay);
+      continue;
+    }
+
+    if (response.ok || !RETRYABLE_HTTP_STATUSES.has(response.status) || attempt === MAX_FETCH_ATTEMPTS) {
+      return response;
+    }
+
+    const delay = 1500 * (2 ** (attempt - 1));
+    console.warn(`CBU returned HTTP ${response.status} (attempt ${attempt}/${MAX_FETCH_ATTEMPTS}); retrying in ${delay} ms`);
+    await response.body?.cancel();
+    await wait(delay);
+  }
+}
 
 db.pragma('journal_mode = WAL');
 db.exec(`CREATE TABLE IF NOT EXISTS price_history (
@@ -68,7 +96,7 @@ export async function fetchUsdRate(date) {
     const requestDay = new Date(day);
     requestDay.setUTCDate(day.getUTCDate() - offset);
     const requestedDate = requestDay.toISOString().slice(0, 10);
-    const response = await fetch(`${FX_URL}/USD/${requestedDate}/`);
+    const response = await fetchFromCbu(`${FX_URL}/USD/${requestedDate}/`);
     if (!response.ok) throw new Error(`CBU currency API returned HTTP ${response.status}`);
     const rates = await response.json();
     const usd = rates.find((entry) => entry.Ccy === 'USD');
@@ -82,7 +110,7 @@ export async function fetchUsdRate(date) {
 }
 
 export async function refreshPrices() {
-  const response = await fetch(SOURCE_URL, { headers: { 'user-agent': 'GoldTracker/1.0 (daily public price archive)' } });
+  const response = await fetchFromCbu(SOURCE_URL, { headers: { 'user-agent': 'GoldTracker/1.0 (daily public price archive)' } });
   if (!response.ok) throw new Error(`CBU returned HTTP ${response.status}`);
   const parsed = parseCbuPage(await response.text());
   const usd = await fetchUsdRate(parsed.date);
