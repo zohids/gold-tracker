@@ -10,7 +10,7 @@ const db = new Database(process.env.DATABASE_PATH || path.join(__dirname, 'gold-
 const SOURCE_URL = 'https://cbu.uz/en/banknotes-coins/gold-bars/prices/';
 const FX_URL = 'https://cbu.uz/en/arkhiv-kursov-valyut/json/USD';
 const TIME_ZONE = 'Asia/Tashkent';
-const MAX_FETCH_ATTEMPTS = 3;
+const MAX_FETCH_ATTEMPTS = 5;
 const RETRYABLE_HTTP_STATUSES = new Set([408, 425, 429, 500, 502, 503, 504]);
 
 const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));

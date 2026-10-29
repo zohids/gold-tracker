@@ -33,6 +33,9 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Fetch daily gold prices and export static history
+        # Prefer IPv4 if the hosted runner's IPv6 route to CBU is unreachable.
+        env:
+          NODE_OPTIONS: --dns-result-order=ipv4first
         run: npm run update
       - name: Commit updated price history
         run: |
