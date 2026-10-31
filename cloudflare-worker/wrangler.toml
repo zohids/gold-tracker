@@ -1,0 +1,11 @@
+name = "gold-tracker-price-updater"
+main = "worker.js"
+compatibility_date = "2026-10-29"
+
+[vars]
+GITHUB_OWNER = "zohids"
+GITHUB_REPO = "gold-tracker"
+GITHUB_BRANCH = "main"
+
+[triggers]
+crons = ["0 6 * * *"]

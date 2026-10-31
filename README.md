@@ -19,7 +19,28 @@ Set `FETCH_ON_START=true` to refresh from bank whenever the server starts. Set `
 
 ## Daily schedule
 
-The GitHub Actions workflow runs at 06:00 UTC (11:00 UTC+5), fetches the page, and commits the SQLite history file and static JSON archive. Enable Actions for the repository and allow the workflow to write repository contents. GitHub scheduled workflows can start late during busy periods. Each snapshot is keyed by its collection date in Uzbekistan time; the CBU publication date and time are preserved separately. A repeat run updates the collection day's row without creating duplicates.
+A Cloudflare Worker in `cloudflare-worker/` fetches CBU's page and USD rate at 06:00 UTC (11:00 Asia/Tashkent), then commits the daily snapshot to `public/data/history.json` using the GitHub Contents API. That commit triggers the GitHub Pages deployment workflow. Its protected `/check` endpoint tests CBU reachability without writing history. Each snapshot is keyed by its collection date in Uzbekistan time; the CBU publication date and time are preserved separately. A repeat run updates that collection day's row without creating duplicates.
+
+### Set up the Cloudflare updater
+
+1. Create or sign in to a Cloudflare account and install Node.js/npm if needed.
+2. Create a fine-grained GitHub personal access token for this repository with **Contents: Read and write** permission. Keep the token private.
+3. In Terminal, from the repository root, run:
+
+   ```sh
+   cd cloudflare-worker
+   npx wrangler login
+   npx wrangler secret put GITHUB_TOKEN
+   npx wrangler secret put MANUAL_TRIGGER_TOKEN
+   npx wrangler deploy
+   ```
+
+   Paste the GitHub token when prompted. For `MANUAL_TRIGGER_TOKEN`, use a different random secret (on macOS, `openssl rand -hex 32` generates one). Save it so you can run the connection check below. The Worker is configured for this repository in `wrangler.toml`.
+4. In the deploy output, copy the `workers.dev` URL. Open `<worker-url>/health`; it should return `{"ok":true,...}`.
+5. Test CBU reachability before waiting for the scheduled run. In Terminal, run `curl -X POST -H 'Authorization: Bearer YOUR_MANUAL_TRIGGER_TOKEN' 'https://YOUR_WORKER_URL/check'`, replacing both placeholders. A successful response includes `"cbuReachable":true` and the CBU publication date. This check does not write history.
+6. In Cloudflare, open the Worker’s **Settings → Triggers** and confirm the Cron Trigger is `0 6 * * *` (11:00 Asia/Tashkent). The next scheduled run writes history to GitHub; the resulting push deploys GitHub Pages.
+
+The Cloudflare free Workers plan currently allows Cron Triggers and up to five triggers per account. The first deployment requires a GitHub token, and the CBU connection check must pass before this can replace the existing updater. If the check fails, the CBU route is also unreachable from Cloudflare and the scheduled updater will need to run on a different network.
 
 ## Source fields
 
@@ -29,12 +50,12 @@ Each saved snapshot also stores the bank USD-to-UZS exchange rate effective on t
 
 ## Publish with GitHub Pages
 
-The repository includes a workflow that fetches prices at 11:00 Asia/Tashkent, exports the history to public/data/history.json, and deploys the static site to GitHub Pages.
+The repository includes a workflow that deploys the static site to GitHub Pages when `main` changes. The Cloudflare Worker handles the daily fetch and history commit.
 
 1. Push the project to the repository's default branch.
 2. In GitHub, open **Settings → Pages** and set **Source** to **GitHub Actions**.
-3. Open **Settings → Actions → General** and ensure Actions are allowed. Under **Workflow permissions**, select **Read and write permissions** so the scheduled workflow can commit updated price history.
-4. Push this workflow to GitHub, then open **Actions → Update prices and publish site** and select **Run workflow** for the first deployment.
+3. Open **Settings → Actions → General** and ensure Actions are allowed. The Pages workflow only needs read access to the repository.
+4. Push this workflow to GitHub, then open **Actions → Deploy Gold Tracker** and select **Run workflow** for the first deployment.
 5. After the workflow succeeds, open the site URL shown under **Settings → Pages**.
 
-The scheduled workflow also redeploys the site after each daily update. Scheduled workflows may start late during busy periods.
+Each successful Worker update pushes the changed history file to `main`, which redeploys the site.
